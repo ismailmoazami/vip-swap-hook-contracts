@@ -8,3 +8,4 @@ hardhat/=lib/v4-core/node_modules/hardhat/
 openzeppelin-contracts/=lib/v4-periphery/lib/v4-core/lib/openzeppelin-contracts/
 v4-core/=lib/v4-core/src/
 v4-periphery/=lib/v4-periphery/
+solmate/=lib/solmate/

@@ -13,7 +13,7 @@ import {Hooks} from "v4-core/libraries/Hooks.sol";
 import {LPFeeLibrary} from "v4-core/libraries/LPFeeLibrary.sol";
 import {BeforeSwapDelta, BeforeSwapDeltaLibrary} from "v4-core/types/BeforeSwapDelta.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-
+import {console} from "forge-std/console.sol";
 contract VipSwap is BaseHook {
 
     address owner;
@@ -64,9 +64,13 @@ contract VipSwap is BaseHook {
 
     function beforeSwap(address user, PoolKey calldata, IPoolManager.SwapParams calldata, bytes calldata hookData)
         external
+        view
         override
+        onlyPoolManager
         returns (bytes4, BeforeSwapDelta, uint24)
     {   
+        console.log("User: ", user);
+        
         (address collection, uint256 tokenId) = abi.decode(hookData, (address, uint256));
         if(!isVip[collection] || IERC721(collection).ownerOf(tokenId) != user){
             revert MustBeOwnerOfVipCollection();
