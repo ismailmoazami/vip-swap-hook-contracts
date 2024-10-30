@@ -13,13 +13,13 @@ import {Hooks} from "v4-core/libraries/Hooks.sol";
 import {LPFeeLibrary} from "v4-core/libraries/LPFeeLibrary.sol";
 import {BeforeSwapDelta, BeforeSwapDeltaLibrary} from "v4-core/types/BeforeSwapDelta.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {console} from "forge-std/console.sol";
+
 contract VipSwap is BaseHook {
 
     address owner;
     mapping(address => bool) public isVip;
 
-    error MustBeOwnerOfVipCollection();
+    error MustBeHolderOfVipCollection();
     error NotOwner();
 
     modifier onlyOwner() {
@@ -62,18 +62,17 @@ contract VipSwap is BaseHook {
                 });
         }
 
-    function beforeSwap(address user, PoolKey calldata, IPoolManager.SwapParams calldata, bytes calldata hookData)
+    function beforeSwap(address, PoolKey calldata, IPoolManager.SwapParams calldata, bytes calldata hookData)
         external
         view
         override
         onlyPoolManager
         returns (bytes4, BeforeSwapDelta, uint24)
     {   
-        console.log("User: ", user);
         
-        (address collection, uint256 tokenId) = abi.decode(hookData, (address, uint256));
+        (address collection, address user, uint256 tokenId) = abi.decode(hookData, (address, address, uint256));
         if(!isVip[collection] || IERC721(collection).ownerOf(tokenId) != user){
-            revert MustBeOwnerOfVipCollection();
+            revert MustBeHolderOfVipCollection();
         }
 
         return (this.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, 0);
@@ -84,8 +83,8 @@ contract VipSwap is BaseHook {
     }
 
     // View and Pure functions 
-    function getHookData(address _collection, uint256 _tokenId) public pure returns(bytes memory) {
-        return abi.encode(_collection, _tokenId);
+    function getHookData(address _collection, address _user, uint256 _tokenId) public pure returns(bytes memory) {
+        return abi.encode(_collection, _user, _tokenId);
     }
 
 }

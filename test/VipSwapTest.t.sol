@@ -56,25 +56,25 @@ contract VipSwapTest is Test, Deployers{
 
     }
 
-    // function test_cant_swap_if_not_owner_of_vip_collection() external {
+    function test_cant_swap_if_not_owner_of_vip_collection() external {
        
-    //     PoolSwapTest.TestSettings memory testSettings = PoolSwapTest.TestSettings({
-    //         takeClaims: false, settleUsingBurn: false
-    //     });
+        PoolSwapTest.TestSettings memory testSettings = PoolSwapTest.TestSettings({
+            takeClaims: false, settleUsingBurn: false
+        });
 
-    //     IPoolManager.SwapParams memory params = IPoolManager.SwapParams({
-    //         zeroForOne: true, 
-    //         amountSpecified: -0.0001 ether,
-    //         sqrtPriceLimitX96: TickMath.MIN_SQRT_PRICE + 1
-    //     });
+        IPoolManager.SwapParams memory params = IPoolManager.SwapParams({
+            zeroForOne: true, 
+            amountSpecified: -0.0001 ether,
+            sqrtPriceLimitX96: TickMath.MIN_SQRT_PRICE + 1
+        });
 
-    //     bytes memory hookData = hook.getHookData(address(0), 0);
-    //     vm.prank(address(1));
+        bytes memory hookData = hook.getHookData(address(0), address(this), 0);
+        vm.prank(address(1));
 
-    //     vm.expectRevert();
-    //     swapRouter.swap(key, params, testSettings, hookData);
+        vm.expectRevert();
+        swapRouter.swap(key, params, testSettings, hookData);
 
-    // }
+    }
 
     function test_can_swap_if_is_owner_of_vip_collection() external {
         
@@ -88,13 +88,7 @@ contract VipSwapTest is Test, Deployers{
             sqrtPriceLimitX96: TickMath.MIN_SQRT_PRICE + 1
         });
 
-        bytes memory hookData = hook.getHookData(address(nft), 1);
-
-        console.log("Is vip? : ", hook.isVip(address(nft)));
-        console.log("is owner of token id 2? : ", nft.ownerOf(1));
-        console.log("msg.sender : ", msg.sender);
-        console.log("address this: ", address(this));
-        console.log("swap router: ", address(swapRouter));
+        bytes memory hookData = hook.getHookData(address(nft), address(this), 1);
         
         uint256 balanceBeforeSwap = currency1.balanceOfSelf();
         swapRouter.swap(key, params, testSettings, hookData);
